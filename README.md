@@ -22,14 +22,19 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 ### Installation & Run
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/yourusername/terminal-Glyph-Gulper.git](https://github.com/yourusername/terminal-Glyph-Gulper.git)
+   git clone https://github.com/ReddyWala/Glyph-Gulper.git
 
 2. **Navigate to the folder:**
 
    ```bash
-   cd terminal-Glyph-Gulper
+   cd Glyph-Gulper
 
-3. **Run the game:**
+3. **Ensure you have the latest code:**
+
+   ```bash
+   git pull origin main
+
+4. **Run the game:**
 
    ```bash
    dotnet run
