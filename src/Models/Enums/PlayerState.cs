@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace GlyphGulper.Enums;
+namespace GlyphGulper.Models.Enums;
 
 /// <summary>
 /// Represents the different states of the player, each with a unique display name 

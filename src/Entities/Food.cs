@@ -1,5 +1,5 @@
-using GlyphGulper.Constants;
 using GlyphGulper.Engine;
+using GlyphGulper.Models.Constants;
 
 namespace GlyphGulper.Entities;
 

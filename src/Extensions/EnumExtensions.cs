@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using GlyphGulper.Enums;
+
+using GlyphGulper.Models.Enums;
 
 namespace GlyphGulper.Extensions;
 

@@ -1,8 +1,9 @@
 using System.Diagnostics;
-using GlyphGulper.Constants;
+
 using GlyphGulper.Entities;
-using GlyphGulper.Enums;
 using GlyphGulper.Extensions;
+using GlyphGulper.Models.Constants;
+using GlyphGulper.Models.Enums;
 
 namespace GlyphGulper.Engine;
 
@@ -108,8 +109,8 @@ public class GameEngine
 
         // 2. Instantiate Entities
         _renderManager = new RenderManager(_cts);
-        _player = new Player(_renderManager, _maxWidth, _maxHeight);
-        _food = new Food(_renderManager, _maxWidth, _maxHeight);
+        _player = new Player(_renderManager, _maxWidth, _maxHeight - 1);
+        _food = new Food(_renderManager, _maxWidth, _maxHeight - 1);
 
         // 3. Setup Timers
         _foodTimer = new System.Timers.Timer(GetFoodVanishingIntervalMs()) { AutoReset = true };

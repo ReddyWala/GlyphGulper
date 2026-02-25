@@ -1,4 +1,4 @@
-using GlyphGulper.Constants;
+using GlyphGulper.Models.Constants;
 
 namespace GlyphGulper.Extensions;
 

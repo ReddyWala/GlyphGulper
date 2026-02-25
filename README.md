@@ -55,12 +55,61 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 
 ---
 
-## 🏗️ Project Structure
+# 📂 Glyph-Gulper Project Structure
 
-* **`GameEngine.cs`**: Orchestrates the main loop, collision detection, and game rules.
-* **`RenderManager.cs`**: A thread-safe utility that batches `Console` calls to prevent UI corruption.
-* **`Player.cs`**: Encapsulates movement logic, boundary clamping, and character states.
-* **`Food.cs`**: Handles randomized spawning and evolution logic.
+The **Glyph-Gulper** project follows a clean, modular architecture that separates game logic from data and utility. It is organized into a src/ folder for the application and a tests/ folder for logic validation, all orchestrated by a root Solution (.sln) file.
+
+## 🏗️ Directory Hierarchy
+
+```text
+Glyph-Gulper/
+├── src/
+│   ├── Engine/                   # The "Brain". Contains Orchestration Logic
+│   │   ├── GameEngine.cs         # Heart of the game (The Loop)
+│   │   └── RenderManager.cs      # High-performance drawing engine
+│   ├── Entities/                 # The "Actors". Contains Game Objects & State Managers
+│   │   ├── Player.cs             # Player logic
+│   │   ├── PlayerStateManager.cs # Manages hunger/mood transitions
+│   │   ├── Food.cs               # Food logic
+│   │   └── FoodStateManager.cs   # Manages food transitions
+│   ├── Extensions/               # The "Toolbelt". Contains Helper Methods (Logic Add-ons)
+│   │   ├── ConsoleExtensions.cs  # Positioning helpers
+│   │   └── EnumExtensions.cs     # GetNextState & DisplayName logic
+│   ├── Models/                   # The "Definitions". Contains Data Contracts
+│   │   ├── Constants/            # Global Settings
+│   │   │   └── GameConstants.cs  # Speeds, symbols, and grid sizes
+│   │   └── Enums/                # State Definitions
+│   │       ├── FoodState.cs      # Evolution tiers (Apple -> Bread -> Luxury)
+│   │       ├── PlayerState.cs    # Vitality status (Happy, Neutral, Dead)
+│   │       └── GameResult.cs     # Win/Loss/Quit states
+│   └── Program.cs                # The "Ignition". Application Entry Point
+├── tests/                        # Unit tests for engine logic
+├── .editorconfig                 # Enforces strict coding standards across the project
+├── .gitignore                    # Prevents /bin and /obj from being tracked
+├── Glyph-Gulper.csproj           # .NET Project configuration
+├── Glyph-Gulper.sln              # Workspace orchestrator and project linker
+├── README.md                     # Project documentation
+├── CHANGELOG.md                  # History of versions
+└── LICENSE                       # MIT License
+
+---
+
+## 🌟 Credits & Acknowledgments
+
+### 🛠️ Built With
+* **[.NET 10.0](https://dotnet.microsoft.com/)** - The primary framework and runtime.
+* **[C#](https://learn.microsoft.com/en-us/dotnet/csharp/)** - Utilizing modern features like String Interpolation, Enums with Display Attributes, and Record types.
+
+### 🏛️ Architecture & Inspiration
+* **Classic Arcade Games** - Core gameplay loop inspired by the "Snake" and "Pac-Man" era of terminal-based gaming.
+* **[Microsoft Learn Portal](https://learn.microsoft.com/)** - Core architectural guidance on .NET project structure and coding conventions.
+
+### 🤝 Contributions
+* **Project Lead:** ReddyWala - *Core Engine and Logic*
+* **Community & Tools:**
+    * **AI Collaboration** - Refactoring assisted by **Gemini** and **GitHub Copilot**.
+    * Microsoft's **dotnet-format** for code cleanliness.
+    * The **.editorconfig** standard for cross-editor consistency.
 
 ---
 
@@ -68,3 +117,6 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 * **High Score System**: Persistence using `System.Text.Json`.
 * **Multi-Food Spawning**: Modifying the engine to handle a `List<Food>` instead of a single instance.
 * **Color Themes**: Adding `ConsoleColor` support to the `RenderManager`.
+
+---
+> *Glyph-Gulper is an open-source project created for the love of terminal-based UI and efficient C# design.*

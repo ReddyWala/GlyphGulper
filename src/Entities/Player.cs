@@ -1,6 +1,6 @@
-using GlyphGulper.Constants;
 using GlyphGulper.Engine;
-using GlyphGulper.Enums;
+using GlyphGulper.Models.Constants;
+using GlyphGulper.Models.Enums;
 
 namespace GlyphGulper.Entities;
 

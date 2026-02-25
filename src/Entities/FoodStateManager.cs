@@ -1,5 +1,5 @@
-using GlyphGulper.Enums;
 using GlyphGulper.Extensions;
+using GlyphGulper.Models.Enums;
 
 namespace GlyphGulper.Entities;
 

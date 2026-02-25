@@ -1,4 +1,4 @@
-namespace GlyphGulper.Constants;
+namespace GlyphGulper.Models.Constants;
 
 /// <summary>
 /// Holds constant values used throughout the game, such as sprite dimensions and endgame messages.

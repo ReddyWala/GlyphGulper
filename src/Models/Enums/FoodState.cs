@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace GlyphGulper.Enums;
+namespace GlyphGulper.Models.Enums;
 
 /// <summary>
 /// Represents the different types of food that can appear in the game, each with a unique 

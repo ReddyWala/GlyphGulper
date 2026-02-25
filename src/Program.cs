@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+
 using GlyphGulper.Engine;
 
 Console.CursorVisible = false;
