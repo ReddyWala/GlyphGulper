@@ -1,3 +1,5 @@
+using System.Collections.Frozen;
+
 using GlyphGulper.Extensions;
 using GlyphGulper.Models.Enums;
 
@@ -13,7 +15,9 @@ public class PlayerStateManager
     /// Preloads the visual representations of each player state using the [Display] attribute 
     /// for efficient access during rendering.
     /// </summary>
-    private readonly string[] Visuals = Enum.GetValues<PlayerState>().Select(v => v.GetDisplayName()).ToArray();
+    private static readonly FrozenDictionary<PlayerState, string> Visuals = Enum.GetValues<PlayerState>()
+            .ToDictionary(v => v, v => v.GetDisplayName())
+            .ToFrozenDictionary();
 
     /// <summary>
     /// Tracks the current state of the player (starting as Happy).
@@ -23,7 +27,7 @@ public class PlayerStateManager
     /// <summary>
     /// Provides the visual representation (sprite) of the current player state for rendering purposes.
     /// </summary>
-    public string Sprite => Visuals[(int)State];
+    public string Sprite => Visuals[State];
 
     /// <summary>
     /// Initializes the PlayerStateManager with the default state (Happy) and preloads visuals for all states.

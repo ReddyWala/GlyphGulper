@@ -1,3 +1,5 @@
+using System.Collections.Frozen;
+
 using GlyphGulper.Extensions;
 using GlyphGulper.Models.Enums;
 
@@ -13,7 +15,9 @@ public class FoodStateManager
     /// Preloads the visual representations of each food state using the [Display] attribute 
     /// for efficient access during rendering.
     /// </summary>
-    private static readonly string[] Visuals = Enum.GetValues<FoodState>().Select(v => v.GetDisplayName()).ToArray();
+    private static readonly FrozenDictionary<FoodState, string> Visuals = Enum.GetValues<FoodState>()
+            .ToDictionary(v => v, v => v.GetDisplayName())
+            .ToFrozenDictionary();
 
     /// <summary>
     /// Tracks the current state of the food (starting as Apples).
@@ -23,7 +27,7 @@ public class FoodStateManager
     /// <summary>
     /// Provides the visual representation (sprite) of the current food state for rendering purposes.
     /// </summary>
-    public string Sprite => Visuals[(int)State];
+    public string Sprite => Visuals[State];
 
     /// <summary>
     /// Initializes the FoodStateManager with the default state (Apples) and preloads visuals for all states.
