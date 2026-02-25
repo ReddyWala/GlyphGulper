@@ -1,4 +1,4 @@
-# 🕹️ Terminal Glyph-Gulper 2026
+# 🕹️ Terminal GlyphGulper 2026
 
 A high-performance, **multi-threaded** .NET console game built with modern C# practices. Navigate your avatar, eat snacks to evolve, and manage your "mood" before time runs out.
 
@@ -22,12 +22,12 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 ### Installation & Run
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/ReddyWala/Glyph-Gulper.git
+   git clone https://github.com/ReddyWala/GlyphGulper.git
 
 2. **Navigate to the folder:**
 
    ```bash
-   cd Glyph-Gulper
+   cd GlyphGulper
 
 3. **Ensure you have the latest code:**
 
@@ -55,44 +55,47 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 
 ---
 
-# 📂 Glyph-Gulper Project Structure
+# 📂 GlyphGulper Project Structure
 
-The **Glyph-Gulper** project follows a clean, modular architecture that separates game logic from data and utility. It is organized into a src/ folder for the application and a tests/ folder for logic validation, all orchestrated by a root Solution (.sln) file.
+The **GlyphGulper** project follows a clean, modular architecture that separates game logic from data and utility. It is organized into a src/ folder for the application and a tests/ folder for logic validation, all orchestrated by a root Solution (.sln) file.
 
 ## 🏗️ Directory Hierarchy
 
 ```text
-Glyph-Gulper/
+GlyphGulper/
 ├── src/
-│   ├── Engine/                   # The "Brain". Contains Orchestration Logic
-│   │   ├── GameEngine.cs         # Heart of the game (The Loop)
-│   │   └── RenderManager.cs      # High-performance drawing engine
-│   ├── Entities/                 # The "Actors". Contains Game Objects & State Managers
-│   │   ├── Player.cs             # Player logic
-│   │   ├── PlayerStateManager.cs # Manages hunger/mood transitions
-│   │   ├── Food.cs               # Food logic
-│   │   └── FoodStateManager.cs   # Manages food transitions
-│   ├── Extensions/               # The "Toolbelt". Contains Helper Methods (Logic Add-ons)
-│   │   ├── ConsoleExtensions.cs  # Positioning helpers
-│   │   └── EnumExtensions.cs     # GetNextState & DisplayName logic
-│   ├── Models/                   # The "Definitions". Contains Data Contracts
-│   │   ├── Constants/            # Global Settings
-│   │   │   └── GameConstants.cs  # Speeds, symbols, and grid sizes
-│   │   └── Enums/                # State Definitions
-│   │       ├── FoodState.cs      # Evolution tiers (Apple -> Bread -> Luxury)
-│   │       ├── PlayerState.cs    # Vitality status (Happy, Neutral, Dead)
-│   │       └── GameResult.cs     # Win/Loss/Quit states
-|   ├── GlyphGulper.csproj        # .NET Project configuration
-│   └── Program.cs                # The "Ignition". Application Entry Point
-├── tests/                        # Unit tests for engine logic
-├── .editorconfig                 # Enforces strict coding standards across the project
-├── .gitignore                    # Prevents /bin and /obj from being tracked
-├── GlyphGulper.sln               # Workspace orchestrator and project linker
-├── README.md                     # Project documentation
-├── CHANGELOG.md                  # History of versions
-└── LICENSE                       # MIT License 
-   ```
----
+│   └── GlyphGulper/                     # Main Project Folder
+│       ├── Engine/                       # The "Brain". Orchestration Logic
+│       │   ├── GameEngine.cs             # Heart of the game (The Loop)
+│       │   └── RenderManager.cs          # High-performance drawing engine
+│       ├── Entities/                     # The "Actors". Game Objects & State Managers
+│       │   ├── Player.cs                 # Player logic
+│       │   ├── PlayerStateManager.cs     # Manages hunger/mood transitions
+│       │   ├── Food.cs                   # Food logic
+│       │   └── FoodStateManager.cs       # Manages food transitions
+│       ├── Extensions/                   # The "Toolbelt". Helper Methods
+│       │   ├── ConsoleExtensions.cs      # Positioning helpers
+│       │   └── EnumExtensions.cs         # GetNextState & DisplayName logic
+│       ├── Models/                       # The "Definitions". Data Contracts
+│       │   ├── Constants/                # Global Settings
+│       │   │   └── GameConstants.cs      # Speeds, symbols, and grid sizes
+│       │   └── Enums/                    # State Definitions
+│       │       ├── FoodState.cs          # Evolution tiers (Apple -> Bread -> Luxury)
+│       │       ├── PlayerState.cs        # Vitality status (Happy, Neutral, Dead)
+│       │       └── GameResult.cs         # Win/Loss/Quit states
+│       ├── GlyphGulper.csproj           # .NET Project configuration
+│       └── Program.cs                    # The "Ignition". Entry Point
+├── tests/                                # Unit tests for engine logic
+│   └── GlyphGulper.Tests/               # Quality Assurance Parent
+│       ├── GlyphGulper.Tests.csproj     # Quality Assurance configuration
+│       └── FoodStateTests.cs             # Logic validation
+├── .editorconfig                         # Enforces strict coding standards
+├── .gitignore                            # Prevents /bin and /obj tracking
+├── GlyphGulper.sln                      # Workspace orchestrator
+├── README.md                             # Project documentation
+├── CHANGELOG.md                          # History of versions
+└── LICENSE                               # MIT License
+```
 
 ## 🌟 Credits & Acknowledgments
 
@@ -119,4 +122,4 @@ Glyph-Gulper/
 * **Color Themes**: Adding `ConsoleColor` support to the `RenderManager`.
 
 ---
-> *Glyph-Gulper is an open-source project created for the love of terminal-based UI and efficient C# design.*
+> *GlyphGulper is an open-source project created for the love of terminal-based UI and efficient C# design.*
