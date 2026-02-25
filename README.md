@@ -61,37 +61,37 @@ The **Glyph-Gulper** project follows a clean, modular architecture that separate
 
 ## 🏗️ Directory Hierarchy
 
-```text
-Glyph-Gulper/
-├── src/
-│   ├── Engine/                   # The "Brain". Contains Orchestration Logic
-│   │   ├── GameEngine.cs         # Heart of the game (The Loop)
-│   │   └── RenderManager.cs      # High-performance drawing engine
-│   ├── Entities/                 # The "Actors". Contains Game Objects & State Managers
-│   │   ├── Player.cs             # Player logic
-│   │   ├── PlayerStateManager.cs # Manages hunger/mood transitions
-│   │   ├── Food.cs               # Food logic
-│   │   └── FoodStateManager.cs   # Manages food transitions
-│   ├── Extensions/               # The "Toolbelt". Contains Helper Methods (Logic Add-ons)
-│   │   ├── ConsoleExtensions.cs  # Positioning helpers
-│   │   └── EnumExtensions.cs     # GetNextState & DisplayName logic
-│   ├── Models/                   # The "Definitions". Contains Data Contracts
-│   │   ├── Constants/            # Global Settings
-│   │   │   └── GameConstants.cs  # Speeds, symbols, and grid sizes
-│   │   └── Enums/                # State Definitions
-│   │       ├── FoodState.cs      # Evolution tiers (Apple -> Bread -> Luxury)
-│   │       ├── PlayerState.cs    # Vitality status (Happy, Neutral, Dead)
-│   │       └── GameResult.cs     # Win/Loss/Quit states
-│   └── Program.cs                # The "Ignition". Application Entry Point
-├── tests/                        # Unit tests for engine logic
-├── .editorconfig                 # Enforces strict coding standards across the project
-├── .gitignore                    # Prevents /bin and /obj from being tracked
-├── Glyph-Gulper.csproj           # .NET Project configuration
-├── Glyph-Gulper.sln              # Workspace orchestrator and project linker
-├── README.md                     # Project documentation
-├── CHANGELOG.md                  # History of versions
-└── LICENSE                       # MIT License
-
+   ```text
+   Glyph-Gulper/
+   ├── src/
+   │   ├── Engine/                   # The "Brain". Contains Orchestration Logic
+   │   │   ├── GameEngine.cs         # Heart of the game (The Loop)
+   │   │   └── RenderManager.cs      # High-performance drawing engine
+   │   ├── Entities/                 # The "Actors". Contains Game Objects & State Managers
+   │   │   ├── Player.cs             # Player logic
+   │   │   ├── PlayerStateManager.cs # Manages hunger/mood transitions
+   │   │   ├── Food.cs               # Food logic
+   │   │   └── FoodStateManager.cs   # Manages food transitions
+   │   ├── Extensions/               # The "Toolbelt". Contains Helper Methods (Logic Add-ons)
+   │   │   ├── ConsoleExtensions.cs  # Positioning helpers
+   │   │   └── EnumExtensions.cs     # GetNextState & DisplayName logic
+   │   ├── Models/                   # The "Definitions". Contains Data Contracts
+   │   │   ├── Constants/            # Global Settings
+   │   │   │   └── GameConstants.cs  # Speeds, symbols, and grid sizes
+   │   │   └── Enums/                # State Definitions
+   │   │       ├── FoodState.cs      # Evolution tiers (Apple -> Bread -> Luxury)
+   │   │       ├── PlayerState.cs    # Vitality status (Happy, Neutral, Dead)
+   │   │       └── GameResult.cs     # Win/Loss/Quit states
+   │   └── Program.cs                # The "Ignition". Application Entry Point
+   ├── tests/                        # Unit tests for engine logic
+   ├── .editorconfig                 # Enforces strict coding standards across the project
+   ├── .gitignore                    # Prevents /bin and /obj from being tracked
+   ├── Glyph-Gulper.csproj           # .NET Project configuration
+   ├── Glyph-Gulper.sln              # Workspace orchestrator and project linker
+   ├── README.md                     # Project documentation
+   ├── CHANGELOG.md                  # History of versions
+   └── LICENSE                       # MIT License   
+   ```
 ---
 
 ## 🌟 Credits & Acknowledgments
