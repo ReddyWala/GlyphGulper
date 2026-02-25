@@ -36,8 +36,24 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 
 4. **Run the game:**
 
+Option A: Run from the Root (Recommended):
+
    ```bash
+   dotnet run --project src/GlyphGulper/GlyphGulper.csproj
+   ```
+
+Option B: Run from the Project Folder:
+
+   ```bash
+   cd src/GlyphGulper
    dotnet run
+   ```
+
+If the game doesn't start or looks strange, ensure your terminal supports ANSI Escape Codes (standard in VS Code, Windows Terminal, and macOS/Linux shells).If you've just renamed the project, you might need to perform a quick cleanup:
+
+   ```bash
+   dotnet clean && dotnet run --project src/GlyphGulper/GlyphGulper.csproj
+   ```
 
 ## 🕹️ How to Play
 
@@ -64,7 +80,7 @@ The **GlyphGulper** project follows a clean, modular architecture that separates
 ```text
 GlyphGulper/
 ├── src/
-│   └── GlyphGulper/                     # Main Project Folder
+│   └── GlyphGulper/                      # Main Project Folder
 │       ├── Engine/                       # The "Brain". Orchestration Logic
 │       │   ├── GameEngine.cs             # Heart of the game (The Loop)
 │       │   └── RenderManager.cs          # High-performance drawing engine
@@ -83,15 +99,15 @@ GlyphGulper/
 │       │       ├── FoodState.cs          # Evolution tiers (Apple -> Bread -> Luxury)
 │       │       ├── PlayerState.cs        # Vitality status (Happy, Neutral, Dead)
 │       │       └── GameResult.cs         # Win/Loss/Quit states
-│       ├── GlyphGulper.csproj           # .NET Project configuration
+│       ├── GlyphGulper.csproj            # .NET Project configuration
 │       └── Program.cs                    # The "Ignition". Entry Point
 ├── tests/                                # Unit tests for engine logic
-│   └── GlyphGulper.Tests/               # Quality Assurance Parent
-│       ├── GlyphGulper.Tests.csproj     # Quality Assurance configuration
+│   └── GlyphGulper.Tests/                # Quality Assurance Parent
+│       ├── GlyphGulper.Tests.csproj      # Quality Assurance configuration
 │       └── FoodStateTests.cs             # Logic validation
 ├── .editorconfig                         # Enforces strict coding standards
 ├── .gitignore                            # Prevents /bin and /obj tracking
-├── GlyphGulper.sln                      # Workspace orchestrator
+├── GlyphGulper.sln                       # Workspace orchestrator
 ├── README.md                             # Project documentation
 ├── CHANGELOG.md                          # History of versions
 └── LICENSE                               # MIT License
