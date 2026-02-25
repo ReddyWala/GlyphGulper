@@ -90,8 +90,8 @@ Glyph-Gulper/
 ├── GlyphGulper.sln               # Workspace orchestrator and project linker
 ├── README.md                     # Project documentation
 ├── CHANGELOG.md                  # History of versions
-└── LICENSE                       # MIT License
-
+└── LICENSE                       # MIT License 
+   ```
 ---
 
 ## 🌟 Credits & Acknowledgments
