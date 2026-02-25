@@ -7,7 +7,7 @@ namespace GlyphGulper.Entities;
 /// Manages the state of a food item, including its type (e.g., Apple, Bread, Luxury) 
 /// and the corresponding sprite.
 /// </summary>
-class FoodStateManager
+public class FoodStateManager
 {
     /// <summary>
     /// Preloads the visual representations of each food state using the [Display] attribute 

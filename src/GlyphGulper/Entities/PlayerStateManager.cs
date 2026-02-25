@@ -7,7 +7,7 @@ namespace GlyphGulper.Entities;
 /// Manages the state of the player, including their mood (Happy, Neutral, Dead) 
 /// and the corresponding sprite.
 /// </summary>
-class PlayerStateManager
+public class PlayerStateManager
 {
     /// <summary>
     /// Preloads the visual representations of each player state using the [Display] attribute 

@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlyphGulper", "src\GlyphGulper\GlyphGulper.csproj", "{F38BC7FA-05F0-42A3-B8FF-4892A9400597}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GlyphGulper.Tests", "tests\GlyphGulper.Tests\GlyphGulper.Tests.csproj", "{CCF7C243-26F9-48A8-9748-D13A5A295DBF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,12 +33,25 @@ Global
 		{F38BC7FA-05F0-42A3-B8FF-4892A9400597}.Release|x64.Build.0 = Release|Any CPU
 		{F38BC7FA-05F0-42A3-B8FF-4892A9400597}.Release|x86.ActiveCfg = Release|Any CPU
 		{F38BC7FA-05F0-42A3-B8FF-4892A9400597}.Release|x86.Build.0 = Release|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Debug|x64.Build.0 = Debug|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Debug|x86.Build.0 = Debug|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Release|x64.ActiveCfg = Release|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Release|x64.Build.0 = Release|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Release|x86.ActiveCfg = Release|Any CPU
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F38BC7FA-05F0-42A3-B8FF-4892A9400597} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{CCF7C243-26F9-48A8-9748-D13A5A295DBF} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1C2F9A38-152B-4F81-9E70-7EC1557D30E2}
