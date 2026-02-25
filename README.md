@@ -36,20 +36,20 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 
 4. **Run the game:**
 
-Option A: Run from the Root (Recommended):
+   Option A: Run from the Root (Recommended):
 
    ```bash
    dotnet run --project src/GlyphGulper/GlyphGulper.csproj
    ```
 
-Option B: Run from the Project Folder:
+   Option B: Run from the Project Folder:
 
    ```bash
    cd src/GlyphGulper
    dotnet run
    ```
 
-If the game doesn't start or looks strange, ensure your terminal supports ANSI Escape Codes (standard in VS Code, Windows Terminal, and macOS/Linux shells).If you've just renamed the project, you might need to perform a quick cleanup:
+   If the game doesn't start or looks strange, ensure your terminal supports ANSI Escape Codes (standard in VS Code, Windows Terminal, and macOS/Linux shells).If you've just renamed the project, you might need to perform a quick cleanup:
 
    ```bash
    dotnet clean && dotnet run --project src/GlyphGulper/GlyphGulper.csproj
