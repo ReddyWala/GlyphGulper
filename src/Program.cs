@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using GlyphGulper.Engine;
 
 Console.CursorVisible = false;
 using var registration = PosixSignalRegistration.Create(PosixSignal.SIGINT, context =>
