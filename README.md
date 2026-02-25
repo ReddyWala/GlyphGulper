@@ -82,12 +82,12 @@ Glyph-Gulper/
 │   │       ├── FoodState.cs      # Evolution tiers (Apple -> Bread -> Luxury)
 │   │       ├── PlayerState.cs    # Vitality status (Happy, Neutral, Dead)
 │   │       └── GameResult.cs     # Win/Loss/Quit states
+|   ├── GlyphGulper.csproj        # .NET Project configuration
 │   └── Program.cs                # The "Ignition". Application Entry Point
 ├── tests/                        # Unit tests for engine logic
 ├── .editorconfig                 # Enforces strict coding standards across the project
 ├── .gitignore                    # Prevents /bin and /obj from being tracked
-├── Glyph-Gulper.csproj           # .NET Project configuration
-├── Glyph-Gulper.sln              # Workspace orchestrator and project linker
+├── GlyphGulper.sln               # Workspace orchestrator and project linker
 ├── README.md                     # Project documentation
 ├── CHANGELOG.md                  # History of versions
 └── LICENSE                       # MIT License
