@@ -6,7 +6,7 @@ A high-performance, **multi-threaded** .NET console game built with modern C# pr
 
 ## ✨ Technical Highlights
 
-* **Thread-Safe Rendering**: Uses a `ConcurrentQueue<Action>` producer-consumer pattern to prevent console cursor collisions and flickering.
+* **Thread-Safe Rendering**: Uses a `BlockingCollection<Action>` producer-consumer pattern to prevent console cursor collisions and flickering.
 * **Asynchronous Engine**: The game logic runs on a dedicated background task, keeping the input thread responsive.
 * **State-Driven Design**: Implements `Enums` for Game States, Player Moods, and Food Types with safe validation logic.
 * **Graceful Shutdown**: Utilizes `CancellationTokenSource` to ensure the background thread closes properly and restores the terminal cursor upon exit.
@@ -80,37 +80,63 @@ The **GlyphGulper** project follows a clean, modular architecture that separates
 ```text
 GlyphGulper/
 ├── src/
-│   └── GlyphGulper/                      # Main Project Folder
-│       ├── Engine/                       # The "Brain". Orchestration Logic
-│       │   ├── GameEngine.cs             # Heart of the game (The Loop)
-│       │   └── RenderManager.cs          # High-performance drawing engine
-│       ├── Entities/                     # The "Actors". Game Objects & State Managers
-│       │   ├── Player.cs                 # Player logic
-│       │   ├── PlayerStateManager.cs     # Manages hunger/mood transitions
-│       │   ├── Food.cs                   # Food logic
-│       │   └── FoodStateManager.cs       # Manages food transitions
-│       ├── Extensions/                   # The "Toolbelt". Helper Methods
-│       │   ├── ConsoleExtensions.cs      # Positioning helpers
-│       │   └── EnumExtensions.cs         # GetNextState & DisplayName logic
-│       ├── Models/                       # The "Definitions". Data Contracts
-│       │   ├── Constants/                # Global Settings
-│       │   │   └── GameConstants.cs      # Speeds, symbols, and grid sizes
-│       │   └── Enums/                    # State Definitions
-│       │       ├── FoodState.cs          # Evolution tiers (Apple -> Bread -> Luxury)
-│       │       ├── PlayerState.cs        # Vitality status (Happy, Neutral, Dead)
-│       │       └── GameResult.cs         # Win/Loss/Quit states
-│       ├── GlyphGulper.csproj            # .NET Project configuration
-│       └── Program.cs                    # The "Ignition". Entry Point
-├── tests/                                # Unit tests for engine logic
-│   └── GlyphGulper.Tests/                # Quality Assurance Parent
-│       ├── GlyphGulper.Tests.csproj      # Quality Assurance configuration
-│       └── FoodStateTests.cs             # Logic validation
-├── .editorconfig                         # Enforces strict coding standards
-├── .gitignore                            # Prevents /bin and /obj tracking
-├── GlyphGulper.sln                       # Workspace orchestrator
-├── README.md                             # Project documentation
-├── CHANGELOG.md                          # History of versions
-└── LICENSE                               # MIT License
+│   └── GlyphGulper/                         # Main Project Folder
+│       ├── Engine/                          # COORDINATION LAYER
+│       │   ├── IGameEngine.cs               # Contract for the core game loop and state tracking
+│       │   └── GameEngine.cs                # Central orchestrator; manages timing, input, and win/loss logic
+│       ├── Entities/                        # DOMAIN LAYER (The "What")
+│       │   ├── Food/
+│       │   │   ├── IFood.cs                 # Contract for consumable objects
+│       │   │   ├── Food.cs                  # Implementation of food behavior, respawning, and rendering
+│       │   │   └── FoodStateManager.cs      # Logic for tier-based evolution (Apple -> Bread -> Luxury)
+│       │   └── Player
+│       │       ├── IPlayer.cs               # Contract for the user-controlled entity
+│       │       ├── Player.cs                # Handles movement logic and sprite selection
+│       │       └── PlayerStateManager.cs    # Manages hunger-driven mood transitions (Happy -> Dead)
+│       ├── Extensions/                      # UTILITY LAYER
+│       │   └── EnumExtensions.cs            # Helper methods for state cycling and metadata retrieval
+│       ├── Models/                          # DATA LAYER (The "Specs")
+│       │   ├── Constants/                   # Single Source of Truth for magic numbers and strings
+│       │   │   └── GameConstants.cs         # Config for grid sizes, symbols, and game-balancing values
+│       │   └── Enums/                       # Strongly-typed state definitions
+│       │       ├── FoodState.cs             # Evolution tiers (Apple -> Bread -> Luxury)
+│       │       ├── PlayerState.cs           # Vitality status (Happy, Neutral, Dead)
+│       │       └── GameResult.cs            # Terminal game states (Win/Loss/Quit)
+│       ├── Services/                        # INFRASTRUCTURE LAYER (The "How")
+│       │   ├── Input/                       # Hardware abstraction for keyboard interaction
+│       │   │   ├── IConsole.cs              # Mockable wrapper for System.Console
+│       │   │   ├── IInputService.cs         # Non-blocking input polling logic
+│       │   │   ├── ConsoleInputService.cs   # Wraps keyboard hardware access
+│       │   │   └── WindowsConsole.cs        # OS-specific console implementation
+│       │   ├── Rendering/                   # High-performance drawing
+│       │   │   ├── IRenderManager.cs        # Contract to manage thread-safe drawing
+│       │   │   └── RenderManager.cs         # Thread-safe, queue-based drawing for flicker-free visuals       
+│       │   ├── Resolution/                  # Environmental awareness
+│       │   │   ├── IResolutionManager.cs    # Contract to get coordinate boundaries and detect resizing events
+│       │   │   └── ResolutionManager.cs     # Detects console resizing and boundary constraints
+│       │   └── Timer/                       # Temporal logic
+│       │        ├── IGameTimer.cs           # Contract for mockable, manual-tick timers
+│       │        ├── IGameTimerFactory.cs    # Factory to decouple engine from timer instantiation
+│       │        ├── GameTimer.cs            # High-precision timer driven by the main loop delta
+│       │        └── GameTimerFactory.cs     # Production implementation of the timer creator
+│       ├── GlyphGulper.csproj               # .NET Project configuration
+│       └── Program.cs                       # The "Ignition". Configures DI and ignites the engine
+├── tests/                                   # VERIFICATION LAYER
+│   └── GlyphGulper.Tests/                   # Unit Testing Suite
+│       ├── GlyphGulper.Tests.csproj         # Verifies food evolution logic
+│       ├── FoodStateManagerTests.cs         # Ensures the FoodStateManager transitions correctly through its tiers
+│       ├── GameEngineTestFactory.cs         # "Object Mother" for assembling engines with mocks
+│       ├── GameEngineTests.cs               # Tests win/loss conditions and collision outcomes
+│       ├── GameEngineTimerTests.cs          # Verifies engine response to temporal events
+│       ├── GameTimerTestFactory.cs          # The "Object Mother" for assembling engines with mocks
+│       ├── MockTimer.cs                     # Test-double for manual timer triggering
+│       └── PlayerStateManagerTest.cs        # Verifies mood/vitality state transitions
+├── .editorconfig                            # Enforces strict coding standards
+├── .gitignore                               # Prevents /bin and /obj tracking
+├── GlyphGulper.sln                          # Workspace orchestrator
+├── README.md                                # Project documentation
+├── CHANGELOG.md                             # History of versions
+└── LICENSE                                  # MIT License
 ```
 
 ## 🌟 Credits & Acknowledgments
