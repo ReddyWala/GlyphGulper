@@ -1,162 +1,211 @@
+using System.Collections.Frozen;
 using System.Diagnostics;
 
-using GlyphGulper.Entities;
-using GlyphGulper.Extensions;
+using GlyphGulper.Entities.Food;
+using GlyphGulper.Entities.Player;
 using GlyphGulper.Models.Constants;
 using GlyphGulper.Models.Enums;
+using GlyphGulper.Services.Input;
+using GlyphGulper.Services.Rendering;
+using GlyphGulper.Services.Resolution;
+using GlyphGulper.Services.Timer;
 
 namespace GlyphGulper.Engine;
 
-/// <summary>
-/// The GameEngine class is the core of the GlyphGulper game, responsible for initializing the game state,
-/// managing the main game loop, handling user input, updating game logic, 
-/// and coordinating rendering through the RenderManager. It also manages game timers for 
-/// food vanishing, player mood updates, and UI refreshes.
-/// </summary>
-public class GameEngine
+/// <inheritdoc />
+public class GameEngine : IGameEngine
 {
     /// <summary>
     /// Defines the thresholds for food upgrades and their corresponding vanishing intervals.
     /// (e.g., after eating 3 foods, set a faster vanishing time).
     /// </summary>
-    private static readonly (int eatenFoods, int intervalMs)[] foodUpgradeThresholds = [
-        (0, 9000),
-        (3, 7000),
-        (5, 5000),
-        (10, 4000)
-    ];
+    public static readonly FrozenDictionary<int, int> FoodUpdateThresholds =
+    new Dictionary<int, int>(new Dictionary<int, int>
+    {
+        [0] = 9000,
+        [3] = 7000,
+        [5] = 5000,
+        [10] = 4000
+    }).ToFrozenDictionary();
 
     /// <summary>
-    /// The Player that can move around the screen and has a mood state that changes based on performance.
+    /// Defines the thresholds for player mood updates based on the number of missed foods,
     /// </summary>
-    private readonly Player _player;
+    public static readonly FrozenDictionary<int, PlayerState> MoodUpdateThresholds =
+    new Dictionary<int, PlayerState>(new Dictionary<int, PlayerState>
+    {
+        [2] = PlayerState.Happy,
+        [4] = PlayerState.Neutral,
+        [6] = PlayerState.Dead
+    }).ToFrozenDictionary();
 
-    /// <summary>
-    /// The Food that randomly spawns on the screen and can be "eaten" by the player. 
-    /// It has different states (Apple, Bread, Luxury) that upgrade as the player eats more food.
-    /// </summary>
-    private readonly Food _food;
+    private readonly IPlayer _player;
+
+    /// <inheritdoc />
+    public IPlayer Player => _player;
+
+    private readonly IFood _food;
+
+    /// <inheritdoc />
+    public IFood Food => _food;
 
     // --- Game Timers ---
+    private readonly List<IGameTimer> _timers = new();
+    private readonly Stopwatch _frameClock = new();
+    private double _totalElapseMilliseconds = 0;
 
-    /// <summary>
-    /// The timer to manage the food vanishing, player mood updates.
-    /// </summary>
-    private readonly System.Timers.Timer _foodTimer;
-
-    /// <summary>
-    /// The timer to manage the player mood updates.
-    /// </summary>
-    private readonly System.Timers.Timer _moodTimer;
-
-    /// <summary>
-    /// The timer to manage the UI refreshes (e.g., score and time updates at the bottom of the screen).
-    /// </summary>
-    private readonly System.Timers.Timer _uiTimer;
-
-    /// <summary>
-    /// A stopwatch to track the elapsed game time, which is displayed in the UI.
-    /// </summary>
-    private readonly Stopwatch _gameClock = new Stopwatch();
-
-    /// <summary>
-    /// The counter to track how many foods the player has eaten.
-    /// </summary>
-    private int _foodEaten;
-
-    /// <summary>
-    /// The counter to track how many foods the player has missed 
-    /// (i.e., how many times the food vanished before being eaten).
-    /// </summary>
-    private int _foodMissed;
-
-    /// <summary>
-    /// The main game loop control variable. When set to false, the game will exit.
-    /// </summary>
-    private bool _isRunning = true;
-
-    /// <summary>
-    /// The final result of the game, which can be Win, Loss, or Pending. 
-    /// It is used to display the appropriate end screen message.
-    /// </summary>
-    private GameResult _result = GameResult.Pending;
-
-    /// <summary>
-    /// The screen boundaries are calculated at runtime, 
-    /// we subtract a margin to prevent issues with the UI and player wrapping.
-    /// </summary>
-    private readonly int _maxWidth, _maxHeight;
+    // The 3 Specific Timers
+    private readonly IGameTimer _foodTimer;
+    private readonly IGameTimer _forceEndGameTimer;
+    private readonly IGameTimer _uiTimer;
 
     /// <summary>
     /// The RenderManager is responsible for handling all drawing operations 
     /// on the console in a thread-safe manner,
     /// </summary>
-    private readonly RenderManager _renderManager;
+    private readonly IRenderManager _renderManager;
 
     /// <summary>
-    /// CancellationTokenSource to signal the RenderManager to stop when the game ends,
+    /// Abstracts away console input operations, allowing for 
+    /// non-blocking input handling and easier testing.
     /// </summary>
-    private readonly CancellationTokenSource _cts = new();
+    private readonly IInputService _inputService;
 
     /// <summary>
-    /// The GameEngine constructor initializes all game entities, timers, and calculates screen boundaries.
+    /// The IResolutionManager is responsible for managing screen resolution and boundaries.
     /// </summary>
-    public GameEngine()
+    private readonly IResolutionManager _resolutionManager;
+
+    /// <inheritdoc />
+    public int FoodEaten { get; private set; }
+
+    /// <inheritdoc />
+    public int FoodMissed { get; private set; }
+
+    /// <inheritdoc />
+    public bool IsRunning { get; private set; } = true;
+
+    /// <inheritdoc />
+    public GameResult Result { get; private set; } = GameResult.Pending;
+
+    /// <summary>
+    /// The GameEngine constructor initializes all game entities, timers, and services.
+    /// </summary>
+    public GameEngine(
+        IFood food,
+        IPlayer player,
+        IRenderManager renderManager,
+        IInputService inputService,
+        IResolutionManager resolutionManager,
+        IGameTimerFactory timerFactory)
     {
-        // 1. Setup Boundaries (Subtracting safety margins for UI)
-        _maxWidth = ConsoleExtensions.GetSafeWindowWidth();
-        _maxHeight = ConsoleExtensions.GetSafeWindowHeight();
+        // Instantiate Entities
+        _renderManager = renderManager;
+        _player = player;
+        _food = food;
+        _inputService = inputService;
+        _resolutionManager = resolutionManager;
 
-        // 2. Instantiate Entities
-        _renderManager = new RenderManager(_cts);
-        _player = new Player(_renderManager, _maxWidth, _maxHeight - 1);
-        _food = new Food(_renderManager, _maxWidth, _maxHeight - 1);
+        // Setup Timers
+        _foodTimer = timerFactory.Create(FoodUpdateThresholds.Values.First(), () =>
+        {
+            FoodMissed++;
+            _food.Respawn(_player.X, _player.Y, true);
 
-        // 3. Setup Timers
-        _foodTimer = new System.Timers.Timer(GetFoodVanishingIntervalMs()) { AutoReset = true };
-        _moodTimer = new System.Timers.Timer(15000) { AutoReset = true };
-        _uiTimer = new System.Timers.Timer(1000) { AutoReset = true }; // Create a 1-second "Heartbeat" for the UI
+            // Check if we need to update the player's mood based on the number of foods missed
+            UpdatePlayerMood();
+        });
+
+        _forceEndGameTimer = timerFactory.Create(GameConstants.CheckGameConditionsIntervalMs, () =>
+        {
+            CheckGameConditions();
+        });
+
+        _uiTimer = timerFactory.Create(1000, () => DrawScores());
+
+        _timers.AddRange([_foodTimer, _forceEndGameTimer, _uiTimer]);
     }
 
-    /// <summary>
-    /// Starts the main game loop, initializes the console, launches the background renderer, 
-    /// and handles user input and game logic until the game ends.
-    /// </summary>
+    /// <inheritdoc />
     public void Start()
     {
         InitializeConsole();
 
         // Launch Background Renderer Task
-        Task renderTask = _renderManager.RunRenderer();
+        _renderManager.RunRenderer();
 
         // Note: The Player/Food classes now enqueue their own draw calls inside their Move/Respawn logic
         _food.Respawn(_player.X, _player.Y, false);
         _player.RenderPlayer();
 
-        StartTimers();
+        _frameClock.Start();
 
         // Main Input Loop
-        while (_isRunning)
+        while (IsRunning)
         {
-            if (Console.KeyAvailable)
+            double deltaTime = _frameClock.Elapsed.TotalMilliseconds;
+            _totalElapseMilliseconds += deltaTime;
+            _frameClock.Restart();
+
+            // NON-BLOCKING INPUT
+            // Only call HandleInput if there's a key to read
+            // Decoupled Input Handling - no longer check _console.KeyAvailable directly
+            while (_inputService.AnyKeysPending())
             {
                 HandleInput();
             }
 
-            if (CheckTerminalResize()) _isRunning = false;
+            if (_resolutionManager.HasResized()) IsRunning = false;
+
+            UpdateTimers(deltaTime);
 
             Thread.Sleep(10); // Limit CPU usage
         }
 
-        Cleanup(renderTask);
+        FinishGame();
+    }
+
+    /// <inheritdoc />
+    public void UpdateTimers(double dt)
+    {
+        foreach (var timer in _timers) timer.Update(dt);
+    }
+
+    /// <inheritdoc />
+    public bool WonGame() => FoodEaten >= GameConstants.EatenFoodCountToWin &&
+        FoodMissed <= GameConstants.MissedFoodCountToWin;
+
+    /// <inheritdoc />
+    public bool LostGame() => FoodMissed >= GameConstants.MissedFoodCountToLose;
+
+    /// <inheritdoc />
+    public void CheckCollisions()
+    {
+        // Check if player's head/sprite overlaps the food that means the player has "eaten" the food
+        if (_player.Y == _food.Y && _player.X == _food.X)
+        {
+            _foodTimer.Stop(); // Pause the vanishing clock while we handle the eating logic
+
+            // update the counters
+            FoodEaten++;
+            FoodMissed = Math.Max(0, FoodMissed - 1);
+
+            // Check if we need to upgrade the food type or vanishing speed 
+            // based on the number of foods eaten
+            TryHandleFoodUpgrade();
+
+            // Respawn the food at a new location, ensuring it doesn't spawn on the player
+            _food.Respawn(_player.X, _player.Y, false);
+            _foodTimer.Start(); // Resume the vanishing clock after handling the eating logic
+        }
     }
 
     /// <summary>
     /// Handles user input for player movement and game exit.
     /// </summary>
-    private void HandleInput()
+    internal void HandleInput()
     {
-        var key = Console.ReadKey(true).Key;
+        var key = _inputService.GetNextKey();
 
         switch (key)
         {
@@ -164,108 +213,33 @@ public class GameEngine
             case ConsoleKey.DownArrow: _player.MoveDown(); break;
             case ConsoleKey.LeftArrow: _player.MoveLeft(); break;
             case ConsoleKey.RightArrow: _player.MoveRight(); break;
-            case ConsoleKey.Escape: _isRunning = false; return;
+            case ConsoleKey.Escape: IsRunning = false; return;
         }
 
         CheckCollisions();
     }
 
-    /// <summary>
-    /// Checks for collisions between the player and the food. If a collision is detected 
-    /// (i.e., the player "eats" the food), it updates the score, attempts to upgrade the food,
-    /// respawns the food, and resets the food vanishing timer.
-    /// </summary>
-    private void CheckCollisions()
+    /// <inheritdoc />
+    internal bool TryHandleFoodUpgrade()
     {
-        // Check if player's head/sprite overlaps the food that means the player has "eaten" the food
-        if (_player.Y == _food.Y && _player.X == _food.X)
-        {
-            _foodTimer.Stop(); // Reset the vanishing clock
-
-            // update the counters
-            _foodEaten++;
-            _foodMissed = Math.Max(0, _foodMissed - 1);
-
-            // Check if we need to upgrade the food type or vanishing speed 
-            // based on the number of foods eaten
-            HandleFoodUpgrade();
-
-            // Respawn the food at a new location, ensuring it doesn't spawn on the player
-            _food.Respawn(_player.X, _player.Y, false);
-            // Restart the vanishing clock with the new interval if it was upgraded
-            _foodTimer.Start();
-        }
-    }
-
-    /// <summary>
-    /// Checks if the player has reached any of the food count thresholds.
-    /// </summary>
-    private void HandleFoodUpgrade()
-    {
-        if (ReachedFoodCountTreshold())
+        if (FoodUpdateThresholds.ContainsKey(FoodEaten))
         {
             _food.TryUpdateState(); // Attempt to upgrade the food type (e.g., Apple -> Bread)
-            _foodTimer.Interval = GetFoodVanishingIntervalMs(); // Speed up food vanishing
+            _foodTimer.SetNewInterval(FoodUpdateThresholds[FoodEaten]); // Update the vanishing timer based on the new threshold
+            return true;
         }
+
+        return false;
     }
-
-    /// <summary>
-    /// Starts the timers for food vanishing, player mood updates, and UI refreshes.
-    /// </summary>
-    private void StartTimers()
-    {
-        // Food Vanishing Logic
-        _foodTimer.Elapsed += (s, e) =>
-        {
-            _foodMissed++;
-            _food.Respawn(_player.X, _player.Y, true);
-        };
-
-        // Player Mood / Win-Loss Condition Logic
-        _moodTimer.Elapsed += (s, e) =>
-        {
-            UpdatePlayerMood();
-            CheckGameConditions();
-        };
-
-        _uiTimer.Elapsed += (s, e) =>
-            _renderManager.SubmitDraw(0, Console.WindowHeight - 1, GetScoresLine());
-
-        _foodTimer.Start();
-        _moodTimer.Start();
-        _uiTimer.Start();
-
-        // Start the actual stopwatch when the game begins
-        _gameClock.Start();
-    }
-
-    /// <summary>
-    /// Helper to get the current vanishing interval based on how many foods have been eaten.
-    /// </summary>
-    /// <returns></returns>
-    private int GetFoodVanishingIntervalMs() => foodUpgradeThresholds.FirstOrDefault(
-        t => _foodEaten <= t.eatenFoods, foodUpgradeThresholds.Last()
-    ).intervalMs;
-
-    /// <summary>
-    /// Checks if the player has reached any of the food count thresholds 
-    /// for upgrading the food type and food vanishing timer.
-    /// </summary>
-    /// <returns></returns>
-    private bool ReachedFoodCountTreshold() => foodUpgradeThresholds.Any(t => t.eatenFoods == _foodEaten);
 
     /// <summary>
     /// Updates the player's mood state based on the number of missed foods.
     /// </summary>
-    private void UpdatePlayerMood()
+    internal void UpdatePlayerMood()
     {
-        PlayerState newState;
-        newState = _foodMissed < 3 ? PlayerState.Happy :
-                   _foodMissed < 6 ? PlayerState.Neutral : PlayerState.Dead;
-
-        if (newState != _player.GetState())
+        if (MoodUpdateThresholds.ContainsKey(FoodMissed))
         {
-            _player.SetState(newState);
+            _player.SetState(MoodUpdateThresholds[FoodMissed]);
             _player.RenderPlayer(); // Re-render player to update the mood sprite
         }
     }
@@ -274,34 +248,39 @@ public class GameEngine
     /// Checks the win/loss conditions based on the player's performance (foods eaten vs. missed) 
     /// and updates the game state accordingly.
     /// </summary>
-    private void CheckGameConditions()
+    internal void CheckGameConditions()
     {
-        if (_player.GetState() == PlayerState.Dead && _foodMissed >= 10)
+        if (WonGame())
         {
-            _result = GameResult.Loss;
-            _isRunning = false;
+            Result = GameResult.Win;
+            IsRunning = false;
         }
-        else if (_foodEaten >= 20 && _foodMissed == 0)
+        else if (LostGame())
         {
-            _result = GameResult.Win;
-            _isRunning = false;
+            Result = GameResult.Loss;
+            IsRunning = false;
         }
     }
 
     /// <summary>
     /// Generates the score line to be displayed at the bottom of the screen, 
     /// showing the number of foods eaten, missed, and the elapsed game time.
-    /// <returns></returns>
-    private string GetScoresLine()
+    internal string GetScoresLine()
     {
-        string leftSide = $" EATEN: {_foodEaten}";
-        string rightSide = $"MISSED: {_foodMissed} (FOODTIMER: {_foodTimer.Interval / 1000}s)";
-        string center = $"[ {_gameClock.Elapsed:mm\\:ss} ]";
+        string leftSide = $" EATEN: {FoodEaten}";
+        string rightSide = $"MISSED: {FoodMissed} (FOODTIMER: {_foodTimer.Interval / 1000}s)";
+        string center = $"[ {TimeSpan.FromMilliseconds(_totalElapseMilliseconds):mm\\:ss} ]";
 
         // Calculate spacing to put the clock in the middle
-        int space = (Console.WindowWidth - leftSide.Length - rightSide.Length - center.Length) / 2;
+        int space = (_resolutionManager.Width - leftSide.Length - rightSide.Length - center.Length) / 2;
         string fullLine = leftSide + new string(' ', space) + center + new string(' ', space) + rightSide;
+
         return fullLine;
+    }
+
+    private void DrawScores()
+    {
+        _renderManager.SubmitDraw(0, _resolutionManager.LastLineHeight, GetScoresLine());
     }
 
     /// <summary>
@@ -309,42 +288,24 @@ public class GameEngine
     /// This is called once at the start of the game to set up a clean playing environment.
     /// Note: We do not set fixed window sizes to allow for dynamic resizing, but we do calculate safe boundaries.
     /// </summary>
-    private void InitializeConsole()
-    {
-        Console.CursorVisible = false;
-        Console.Clear();
-    }
-
-    /// <summary>
-    /// Checks if the console window has been resized by comparing the current 
-    /// safe window dimensions to the stored max width and height. If a resize is detected, 
-    /// it returns true to prevent rendering issues and maintain a consistent game experience.
-    /// </summary>
-    private bool CheckTerminalResize() =>
-        _maxHeight != ConsoleExtensions.GetSafeWindowHeight() ||
-        _maxWidth != ConsoleExtensions.GetSafeWindowWidth();
+    internal void InitializeConsole() => _renderManager.SubmitClear();
 
     /// <summary>
     /// Cleans up resources when the game ends, such as stopping timers, canceling the renderer, 
     /// and displaying the appropriate end screen message based on the game result (win/loss).
     /// </summary>
-    /// <param name="renderTask">The task responsible for rendering the game UI.</param>
-    private void Cleanup(Task renderTask)
+    internal void FinishGame()
     {
-        _foodTimer.Stop();
-        _moodTimer.Stop();
-        _cts.Cancel();
+        //_console.ResetColor();
+        //_console.Clear();
+        _renderManager.SubmitClear(true);
 
-        renderTask.Wait(500); // Give the renderer a moment to finish
+        if (Result == GameResult.Win)
+            _renderManager.SubmitDraw(0, 0, GameConstants.YouWinMessage);
+        else if (Result == GameResult.Loss)
+            _renderManager.SubmitDraw(0, 0, GameConstants.GameOverMessage);
 
-        Console.ResetColor();
-        Console.Clear();
-
-        if (_result == GameResult.Win)
-            Console.WriteLine(GameConstants.YouWinMessage);
-        else if (_result == GameResult.Loss)
-            Console.WriteLine(GameConstants.GameOverMessage);
-
-        _cts.Dispose();
+        Thread.Sleep(100);
+        _renderManager.Stop();
     }
 }

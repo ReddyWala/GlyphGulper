@@ -1,6 +1,6 @@
 using FluentAssertions;
 
-using GlyphGulper.Entities;
+using GlyphGulper.Entities.Player;
 using GlyphGulper.Models.Enums;
 
 namespace GlyphGulper.Tests;

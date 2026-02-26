@@ -3,7 +3,7 @@ using System.Collections.Frozen;
 using GlyphGulper.Extensions;
 using GlyphGulper.Models.Enums;
 
-namespace GlyphGulper.Entities;
+namespace GlyphGulper.Entities.Food;
 
 /// <summary>
 /// Manages the state of a food item, including its type (e.g., Apple, Bread, Luxury) 

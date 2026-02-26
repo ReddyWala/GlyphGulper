@@ -1,29 +1,26 @@
-using GlyphGulper.Engine;
 using GlyphGulper.Models.Constants;
 using GlyphGulper.Models.Enums;
+using GlyphGulper.Services.Rendering;
+using GlyphGulper.Services.Resolution;
 
-namespace GlyphGulper.Entities;
+namespace GlyphGulper.Entities.Player;
 
 /// <summary>
 /// Represents the player character, including their position, state, and rendering logic.
 /// </summary>
-public class Player
+public class Player : IPlayer
 {
-    /// <summary>
-    /// The maximum boundaries for the player's movement, used to prevent moving off-screen.
-    /// </summary>
-    private readonly int _maxWidth, _maxHeight;
-
     /// <summary>
     /// Manages rendering operations for the player, allowing for thread-safe updates to the console.
     /// </summary>
-    private readonly RenderManager _renderManager;
+    private readonly IRenderManager _renderManager;
 
     /// <summary>
     /// Manages the player's current state (Happy, Neutral, Dead) and provides 
     /// the corresponding sprite for rendering.
     /// </summary>
     private readonly PlayerStateManager _playerState = new();
+    private readonly IResolutionManager _resolutionManager;
 
     /// <summary>
     /// The player's current X coordinate on the console grid. This is updated through movement methods.
@@ -40,18 +37,15 @@ public class Player
     /// to the center of the screen and preparing the RenderManager and PlayerStateManager for use.
     /// </summary>
     /// <param name="renderManager">The RenderManager instance to use for rendering operations.</param>
-    /// <param name="screenWidth">The width of the game screen in characters.</param>
-    /// <param name="screenHeight">The height of the game screen in characters.</param>
-    public Player(RenderManager renderManager, int screenWidth, int screenHeight)
+    /// <param name="resolutionManager">The IResolutionManager instance to check for terminal resizing
+    public Player(IRenderManager renderManager, IResolutionManager resolutionManager)
     {
         _renderManager = renderManager;
-
-        _maxWidth = screenWidth;
-        _maxHeight = screenHeight;
+        _resolutionManager = resolutionManager;
 
         // Start player in the middle of the screen
-        X = screenWidth / 2;
-        Y = screenHeight / 2;
+        X = _resolutionManager.SafeWidth / 2;
+        Y = _resolutionManager.SafeHeight / 2;
     }
 
     /// <summary>
@@ -104,8 +98,8 @@ public class Player
     private void ApplyMovement(int targetX, int targetY)
     {
         // 1. Clamp coordinates to screen bounds
-        int newX = Math.Clamp(targetX, 0, _maxWidth);
-        int newY = Math.Clamp(targetY, 0, _maxHeight);
+        int newX = Math.Clamp(targetX, 0, _resolutionManager.SafeWidth);
+        int newY = Math.Clamp(targetY, 0, _resolutionManager.SafeHeight);
 
         // 2. Optimization: If we didn't actually move, don't trigger a redraw
         if (newX == X && newY == Y) return;

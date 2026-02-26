@@ -3,7 +3,7 @@ using System.Collections.Frozen;
 using GlyphGulper.Extensions;
 using GlyphGulper.Models.Enums;
 
-namespace GlyphGulper.Entities;
+namespace GlyphGulper.Entities.Player;
 
 /// <summary>
 /// Manages the state of the player, including their mood (Happy, Neutral, Dead) 

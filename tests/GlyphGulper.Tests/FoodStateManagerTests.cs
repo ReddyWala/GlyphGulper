@@ -1,4 +1,4 @@
-﻿using GlyphGulper.Entities;
+﻿using GlyphGulper.Entities.Food;
 using GlyphGulper.Models.Enums;
 
 namespace GlyphGulper.Tests;

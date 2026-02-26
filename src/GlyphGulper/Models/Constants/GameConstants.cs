@@ -12,6 +12,14 @@ public static class GameConstants
     public const int SpriteWidth = 5;
 
     /// <summary>
+    /// The interval in milliseconds at which the player's mood updates, causing the sprite to change.
+    /// </summary>
+    public const int CheckGameConditionsIntervalMs = 15000;
+    public const int EatenFoodCountToWin = 20;
+    public const int MissedFoodCountToWin = 0;
+    public const int MissedFoodCountToLose = 8;
+
+    /// <summary>
     /// The message displayed on the console when the player wins the game.
     /// </summary>
     public const string YouWinMessage = @"

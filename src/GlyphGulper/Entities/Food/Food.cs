@@ -1,23 +1,19 @@
-using GlyphGulper.Engine;
 using GlyphGulper.Models.Constants;
+using GlyphGulper.Services.Rendering;
+using GlyphGulper.Services.Resolution;
 
-namespace GlyphGulper.Entities;
+namespace GlyphGulper.Entities.Food;
 
 /// <summary>
 /// Represents a food item in the game, including its position, state, and rendering logic.
 /// </summary>
-public class Food
+public class Food : IFood
 {
     /// <summary>
     /// Random number generator used for respawning the food at random locations on the screen, 
     /// ensuring variability in gameplay.
     /// </summary>
     private static readonly Random Rnd = new Random();
-
-    /// <summary>
-    /// The maximum boundaries for the food's movement, used to prevent moving off-screen.
-    /// </summary>
-    private readonly int _maxWidth, _maxHeight;
 
     /// <summary>
     /// Manages the current state of the food (Apple, Bread, Luxury) and provides 
@@ -29,7 +25,9 @@ public class Food
     /// Manages rendering operations for the food, allowing for thread-safe updates 
     /// to the console when the food moves or changes state.
     /// </summary>
-    private readonly RenderManager _renderManager;
+    private readonly IRenderManager _renderManager;
+
+    private readonly IResolutionManager _resolutionManager;
 
     /// <summary>
     /// The food's current X coordinate on the console grid. This is updated through the Respawn method.
@@ -46,14 +44,11 @@ public class Food
     /// boundaries for the food's movement. 
     /// </summary>
     /// <param name="renderManager">The RenderManager instance to use for rendering operations.</param>
-    /// <param name="maxWidth">The maximum width of the game screen in characters.</param>
-    /// <param name="maxHeight">The maximum height of the game screen in characters.</param>
-    public Food(RenderManager renderManager, int maxWidth, int maxHeight)
+    /// <param name="resolutionManager">The IResolutionManager instance to check for terminal resizing.</param>
+    public Food(IRenderManager renderManager, IResolutionManager resolutionManager)
     {
         _renderManager = renderManager;
-
-        _maxWidth = maxWidth;
-        _maxHeight = maxHeight;
+        _resolutionManager = resolutionManager;
     }
 
     /// <summary>
@@ -79,8 +74,8 @@ public class Food
         do
         {
             // Ensure food stays within window bounds
-            newX = Rnd.Next(0, _maxWidth);
-            newY = Rnd.Next(0, _maxHeight);
+            newX = Rnd.Next(0, _resolutionManager.SafeWidth);
+            newY = Rnd.Next(0, _resolutionManager.SafeHeight);
         }
         // Keep rolling if the food would overlap the player's position
         while (newY == playerY && newX >= playerX && newX <= playerXMax);
